@@ -1,4 +1,4 @@
-module SDNsquare/netaddr
+module github.com/SDNsquare/netaddr
 
 go 1.12
 
