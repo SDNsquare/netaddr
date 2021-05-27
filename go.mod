@@ -1,4 +1,4 @@
-module inet.af/netaddr
+module SDNsquare/netaddr
 
 go 1.12
 
