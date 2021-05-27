@@ -13,6 +13,7 @@
 package netaddr // import "inet.af/netaddr"
 
 import (
+	"database/sql/driver"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -374,6 +375,29 @@ func FromStdIPRaw(std net.IP) (ip IP, ok bool) {
 		return ipv6Slice(std), true
 	}
 	return IP{}, false
+}
+
+func (ip *IP) Scan(value interface{}) error {
+	if value == nil {
+		ip.UnmarshalText([]byte(""))
+		return nil
+	} else {
+		if v, err := driver.String.ConvertValue(value); err == nil {
+			if vs, ok := v.(string); ok {
+				ip.UnmarshalText([]byte(vs))
+				return nil
+			}
+		}
+	}
+	return errors.New("failed to scan IP")
+}
+
+func (ip IP) Value() (driver.Value, error) {
+	if v, err := ip.MarshalText(); err == nil {
+		return string(v), nil
+	} else {
+		return nil, err
+	}
 }
 
 // v4 returns the i'th byte of ip. If ip is not an IPv4, v4 returns
@@ -1248,6 +1272,29 @@ func (p IPPrefix) Masked() IPPrefix {
 		return m
 	}
 	return IPPrefix{}
+}
+
+func (ip *IPPrefix) Scan(value interface{}) error {
+	if value == nil {
+		ip.UnmarshalText([]byte(""))
+		return nil
+	} else {
+		if v, err := driver.String.ConvertValue(value); err == nil {
+			if vs, ok := v.(string); ok {
+				ip.UnmarshalText([]byte(vs))
+				return nil
+			}
+		}
+	}
+	return errors.New("failed to scan IP")
+}
+
+func (ip IPPrefix) Value() (driver.Value, error) {
+	if v, err := ip.MarshalText(); err == nil {
+		return string(v), nil
+	} else {
+		return nil, err
+	}
 }
 
 // Range returns the inclusive range of IPs that p covers.
