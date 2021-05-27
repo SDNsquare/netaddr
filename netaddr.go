@@ -1286,7 +1286,7 @@ func (ip *IPPrefix) Scan(value interface{}) error {
 			}
 		}
 	}
-	return errors.New("failed to scan IP")
+	return errors.New("failed to scan ip")
 }
 
 func (ip IPPrefix) Value() (driver.Value, error) {
