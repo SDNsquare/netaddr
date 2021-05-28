@@ -1480,6 +1480,29 @@ func (p IPPrefix) lastIP() IP {
 	}
 }
 
+func (p IPPrefix) Subnets(mask uint8) ([]IPPrefix, error) {
+	bits := p.Bits()
+	if bits > mask {
+		return nil, errors.New("netaddr: cannot split smaller range in subnets")
+	}
+	if mask == 0 {
+		mask = bits + 1
+	}
+	netlist := make([]IPPrefix, 0)
+	first := IPPrefixFrom(p.Range().From(), mask)
+	netlist = append(netlist, first)
+	var zero IP
+	for netlist[len(netlist)-1].Range().To() != p.Range().To() {
+		ng := netlist[len(netlist)-1].Range().To().Next()
+		if ng == zero {
+			break
+		}
+		nextrange := IPPrefixFrom(ng, mask)
+		netlist = append(netlist, nextrange)
+	}
+	return netlist, nil
+}
+
 // IPRange represents an inclusive range of IP addresses
 // from the same address family.
 //
