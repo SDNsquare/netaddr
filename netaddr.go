@@ -1480,6 +1480,35 @@ func (p IPPrefix) lastIP() IP {
 	}
 }
 
+func (p IPPrefix) NextSubnet() IPPrefix {
+	return IPPrefixFrom(p.Range().To().Next(), p.Bits())
+}
+
+func (p IPPrefix) PreviousSubnet() IPPrefix {
+	return IPPrefixFrom(p.Range().From().Prior(), p.Bits()).Masked()
+}
+
+func (p IPPrefix) VerifyNoOverlap(subnets []*IPPrefix) bool {
+	for _, s := range subnets {
+		if p.Overlaps(*s) {
+			return true
+		}
+	}
+	return false
+}
+
+func (p IPPrefix) CountIPs() uint64 {
+	ones := p.Bits()
+	exp := 32 - ones
+	if exp == 1 {
+		return uint64(0) // special handling for /31
+	}
+	if exp == 0 {
+		return uint64(1) // special handling for /32
+	}
+	return uint64(math.Pow(2, float64(exp))) - 2
+}
+
 func (p IPPrefix) Subnets(mask uint8) ([]IPPrefix, error) {
 	bits := p.Bits()
 	if bits > mask {
