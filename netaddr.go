@@ -1352,6 +1352,15 @@ func (p IPPrefix) Contains(ip IP) bool {
 	}
 }
 
+func (p IPPrefix) ExtendedMask() string {
+	m32 := uint32(0xffffffff) ^ (uint32(0xffffffff) >> uint32(p.bits))
+	return fmt.Sprintf("%d.%d.%d.%d",
+		m32>>24&0xff,
+		m32>>16&0xff,
+		m32>>8&0xff,
+		m32&0xff)
+}
+
 // Overlaps reports whether p and o overlap at all.
 //
 // If p and o are of different address families or either have a zero
